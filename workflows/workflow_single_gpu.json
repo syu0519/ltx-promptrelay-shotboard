@@ -1,0 +1,596 @@
+{
+  "154": {
+    "inputs": {
+      "sampler_name": "euler_ancestral"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "K采样器选择"
+    }
+  },
+  "164": {
+    "inputs": {
+      "frame_rate": 24,
+      "positive": [
+        "607",
+        1
+      ],
+      "negative": [
+        "420",
+        0
+      ]
+    },
+    "class_type": "LTXVConditioning",
+    "_meta": {
+      "title": "LTXV条件"
+    }
+  },
+  "358": {
+    "inputs": {
+      "start_step": 0,
+      "end_step": -1,
+      "sigmas": [
+        "514",
+        0
+      ]
+    },
+    "class_type": "VisualizeSigmasKJ",
+    "_meta": {
+      "title": "VisualizeSigmasKJ"
+    }
+  },
+  "420": {
+    "inputs": {
+      "conditioning": [
+        "607",
+        1
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "471": {
+    "inputs": {
+      "samples": [
+        "549",
+        0
+      ],
+      "vae": [
+        "610",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE解码"
+    }
+  },
+  "514": {
+    "inputs": {
+      "scheduler": "linear_quadratic",
+      "steps": 8,
+      "denoise": 1,
+      "model": [
+        "542",
+        0
+      ]
+    },
+    "class_type": "BasicScheduler",
+    "_meta": {
+      "title": "基本调度器"
+    }
+  },
+  "542": {
+    "inputs": {
+      "sage_attention": "disabled",
+      "allow_compile": false,
+      "model": [
+        "611",
+        0
+      ]
+    },
+    "class_type": "PathchSageAttentionKJ",
+    "_meta": {
+      "title": "Patch Sage Attention KJ"
+    }
+  },
+  "547": {
+    "inputs": {
+      "frames_number": 561,
+      "frame_rate": 24,
+      "batch_size": 1,
+      "audio_vae": [
+        "612",
+        0
+      ]
+    },
+    "class_type": "LTXVEmptyLatentAudio",
+    "_meta": {
+      "title": "LTXV 空音频潜空间"
+    }
+  },
+  "548": {
+    "inputs": {
+      "video_latent": [
+        "582",
+        0
+      ],
+      "audio_latent": [
+        "547",
+        0
+      ]
+    },
+    "class_type": "LTXVConcatAVLatent",
+    "_meta": {
+      "title": "LTXVConcatAVLatent"
+    }
+  },
+  "549": {
+    "inputs": {
+      "av_latent": [
+        "561",
+        0
+      ]
+    },
+    "class_type": "LTXVSeparateAVLatent",
+    "_meta": {
+      "title": "LTXV分离音视频潜空间"
+    }
+  },
+  "550": {
+    "inputs": {
+      "samples": [
+        "549",
+        1
+      ],
+      "audio_vae": [
+        "612",
+        0
+      ]
+    },
+    "class_type": "LTXVAudioVAEDecode",
+    "_meta": {
+      "title": "LTXV音频VAE解码"
+    }
+  },
+  "561": {
+    "inputs": {
+      "add_noise": true,
+      "noise_seed": 42,
+      "cfg": 1,
+      "model": [
+        "588",
+        0
+      ],
+      "positive": [
+        "164",
+        0
+      ],
+      "negative": [
+        "164",
+        1
+      ],
+      "sampler": [
+        "154",
+        0
+      ],
+      "sigmas": [
+        "358",
+        0
+      ],
+      "latent_image": [
+        "548",
+        0
+      ]
+    },
+    "class_type": "SamplerCustom",
+    "_meta": {
+      "title": "自定义采样器"
+    }
+  },
+  "562": {
+    "inputs": {
+      "images": [
+        "358",
+        1
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "577": {
+    "inputs": {
+      "width": 832,
+      "height": 464,
+      "length": 561,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLTXVLatentVideo",
+    "_meta": {
+      "title": "空Latent 832x464 561幀 @24fps"
+    }
+  },
+  "582": {
+    "inputs": {
+      "num_images": "9",
+      "vae": [
+        "610",
+        2
+      ],
+      "latent": [
+        "577",
+        0
+      ],
+      "num_images.strength_1": 1,
+      "num_images.index_1": 0,
+      "num_images.image_1": [
+        "586_01",
+        0
+      ],
+      "num_images.strength_2": 1,
+      "num_images.index_2": 56,
+      "num_images.image_2": [
+        "586_02",
+        0
+      ],
+      "num_images.strength_3": 1,
+      "num_images.index_3": 112,
+      "num_images.image_3": [
+        "586_03",
+        0
+      ],
+      "num_images.strength_4": 1,
+      "num_images.index_4": 184,
+      "num_images.image_4": [
+        "586_04",
+        0
+      ],
+      "num_images.strength_5": 1,
+      "num_images.index_5": 232,
+      "num_images.image_5": [
+        "586_05",
+        0
+      ],
+      "num_images.strength_6": 1,
+      "num_images.index_6": 304,
+      "num_images.image_6": [
+        "586_06",
+        0
+      ],
+      "num_images.strength_7": 1,
+      "num_images.index_7": 360,
+      "num_images.image_7": [
+        "586_07",
+        0
+      ],
+      "num_images.strength_8": 1,
+      "num_images.index_8": 416,
+      "num_images.image_8": [
+        "586_08",
+        0
+      ],
+      "num_images.strength_9": 1,
+      "num_images.index_9": 488,
+      "num_images.image_9": [
+        "586_09",
+        0
+      ]
+    },
+    "class_type": "LTXVImgToVideoInplaceKJ",
+    "_meta": {
+      "title": "多圖錨定 9張"
+    }
+  },
+  "588": {
+    "inputs": {
+      "preview_rate": 8,
+      "model": [
+        "607",
+        0
+      ]
+    },
+    "class_type": "LTX2SamplingPreviewOverride",
+    "_meta": {
+      "title": "LTX2 Sampling Preview Override"
+    }
+  },
+  "604": {
+    "inputs": {
+      "frame_rate": 24,
+      "loop_count": 0,
+      "filename_prefix": "ltx23_zibai",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 19,
+      "save_metadata": true,
+      "trim_to_audio": false,
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "471",
+        0
+      ],
+      "audio": [
+        "550",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "輸出 MP4"
+    }
+  },
+  "607": {
+    "inputs": {
+      "global_prompt": "Amy, young East Asian woman, short black bob haircut with straight bangs, black-rimmed glasses, soft observant eyes, oversized beige hoodie with dark navy hood lining, slightly loose posture, gentle but distant presence, natural fabric wrinkles and lived-in texture, holding an old film camera, warm white light, analog film grain, slight overexposure, soft glow, imperfect composition, cinematic realism, nostalgic photography",
+      "max_frames": 561,
+      "timeline_data": "{\"segments\":[{\"prompt\":\"Medium shot, slow push-in, Zibai sits on the edge of a bed in a sterile cold-blue digital bedroom, holding a smartphone and scrolling with a hollow uncertain gaze, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold LED strips and algorithmic blue light, overly perfect room with no dust or noise\",\"length\":56,\"color\":\"#4f8edc\"},{\"prompt\":\"Extreme close-up, lateral tracking across a smartphone screen, food delivery app choices rapidly blur and overlap, ramen, rice bowls, fried chicken, brunch and bento flicker like a malfunctioning algorithm, Zibai's fingers hesitate at the edge of the screen, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue screen light with slight digital glitch trails\",\"length\":56,\"color\":\"#e07b3a\"},{\"prompt\":\"Mirror medium shot, slow dolly-in, Zibai faces a tall mirror and sees two slightly offset reflections of herself, one calm and one exhausted, behind her stands Doufu, a worn humanoid robot with scratches, asymmetrical metal parts and a small damaged joint, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue lighting with faint unstable reflections\",\"length\":72,\"color\":\"#9b59b6\"},{\"prompt\":\"Macro close-up, slow orbit camera movement, hyper-perfect ramen, cheese toast stretching too smoothly, and iced soda with unnaturally timed bubbles appear on a clean metallic table, the food looks beautiful but emotionally empty, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, polished cold blue commercial lighting with artificial warm highlights\",\"length\":48,\"color\":\"#d9534f\"},{\"prompt\":\"Warm analog medium shot, handheld slight drift, an imperfect bowl of noodles sits on a wooden table, steam moves unevenly, a blurred residual image of Amy-like presence smiles behind fogged glass but never becomes fully clear, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, warm film grain, slight overexposure, nostalgic amber light leaking through the frame\",\"length\":72,\"color\":\"#5cb85c\"},{\"prompt\":\"Medium close-up, slow push-in, Zibai sits frozen on the bed, phone lowered in her hands, her eyes search for an answer she cannot name, a translucent blue biometric interface floats beside her showing stress overload, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue digital light, sterile perfect bedroom, speaking in Mandarin Chinese, she says: \\\"我不知道我要什麼。\\\", speaking in Mandarin Chinese, she says: \\\"我不知道我要什麼。\\\"\",\"length\":56,\"color\":\"#f39c12\"},{\"prompt\":\"Medium motion shot, handheld follow camera, Zibai suddenly stands and opens the door while clutching keys, her movement is imperfect and rushed, Doufu stands behind her with worn metal body and faint warm light leaking from a cracked joint, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue room light cut by a thin warmer hallway glow\",\"length\":56,\"color\":\"#1abc9c\"},{\"prompt\":\"Wide shot from behind, slow forward dolly, Zibai stands alone before a perfectly aligned row of glowing restaurant storefronts on a wet night street, neon reflections stretch across the pavement, every choice looks optimized and empty, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue night ambience mixed with distant warm shop light\",\"length\":72,\"color\":\"#e74c3c\"},{\"prompt\":\"Medium shot, slow static hold, Zibai sits alone in a convenience store booth eating instant noodles, the packaging is torn unevenly, a rice ball wrapper and tea bottle rest beside her, a small imperfect warm light falls across the table, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, warm fluorescent convenience store light gently breaking the cold world, quiet emotional afterglow\",\"length\":72,\"color\":\"#3498db\"}]}",
+      "local_prompts": "Medium shot, slow push-in, Zibai sits on the edge of a bed in a sterile cold-blue digital bedroom, holding a smartphone and scrolling with a hollow uncertain gaze, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold LED strips and algorithmic blue light, overly perfect room with no dust or noise | Extreme close-up, lateral tracking across a smartphone screen, food delivery app choices rapidly blur and overlap, ramen, rice bowls, fried chicken, brunch and bento flicker like a malfunctioning algorithm, Zibai's fingers hesitate at the edge of the screen, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue screen light with slight digital glitch trails | Mirror medium shot, slow dolly-in, Zibai faces a tall mirror and sees two slightly offset reflections of herself, one calm and one exhausted, behind her stands Doufu, a worn humanoid robot with scratches, asymmetrical metal parts and a small damaged joint, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue lighting with faint unstable reflections | Macro close-up, slow orbit camera movement, hyper-perfect ramen, cheese toast stretching too smoothly, and iced soda with unnaturally timed bubbles appear on a clean metallic table, the food looks beautiful but emotionally empty, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, polished cold blue commercial lighting with artificial warm highlights | Warm analog medium shot, handheld slight drift, an imperfect bowl of noodles sits on a wooden table, steam moves unevenly, a blurred residual image of Amy-like presence smiles behind fogged glass but never becomes fully clear, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, warm film grain, slight overexposure, nostalgic amber light leaking through the frame | Medium close-up, slow push-in, Zibai sits frozen on the bed, phone lowered in her hands, her eyes search for an answer she cannot name, a translucent blue biometric interface floats beside her showing stress overload, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue digital light, sterile perfect bedroom, speaking in Mandarin Chinese, she says: \"我不知道我要什麼。\", speaking in Mandarin Chinese, she says: \"我不知道我要什麼。\" | Medium motion shot, handheld follow camera, Zibai suddenly stands and opens the door while clutching keys, her movement is imperfect and rushed, Doufu stands behind her with worn metal body and faint warm light leaking from a cracked joint, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue room light cut by a thin warmer hallway glow | Wide shot from behind, slow forward dolly, Zibai stands alone before a perfectly aligned row of glowing restaurant storefronts on a wet night street, neon reflections stretch across the pavement, every choice looks optimized and empty, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, cold blue night ambience mixed with distant warm shop light | Medium shot, slow static hold, Zibai sits alone in a convenience store booth eating instant noodles, the packaging is torn unevenly, a rice ball wrapper and tea bottle rest beside her, a small imperfect warm light falls across the table, silver-white high ponytail, golden-blonde center streak in bangs, jade-teal geometric earrings, golden-amber eyes, black techwear-lite outfit, white chunky platform boots, cinematic photorealism, shallow depth of field, warm fluorescent convenience store light gently breaking the cold world, quiet emotional afterglow",
+      "segment_lengths": "56, 56, 72, 48, 72, 56, 56, 72, 72",
+      "epsilon": 0.001,
+      "fps": 24,
+      "time_units": "frames",
+      "model": [
+        "542",
+        0
+      ],
+      "clip": [
+        "613",
+        0
+      ],
+      "latent": [
+        "577",
+        0
+      ]
+    },
+    "class_type": "PromptRelayEncodeTimeline",
+    "_meta": {
+      "title": "Prompt Relay 9段分鏡"
+    }
+  },
+  "610": {
+    "inputs": {
+      "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "主模型"
+    }
+  },
+  "611": {
+    "inputs": {
+      "lora_name": "ltx-2.3-22b-distilled-lora-384.safetensors",
+      "strength_model": 0.5,
+      "model": [
+        "610",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "Distilled LoRA"
+    }
+  },
+  "612": {
+    "inputs": {
+      "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors"
+    },
+    "class_type": "LTXVAudioVAELoader",
+    "_meta": {
+      "title": "Audio VAE"
+    }
+  },
+  "613": {
+    "inputs": {
+      "text_encoder": "gemma_3_12B_it_fp4_mixed.safetensors",
+      "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors",
+      "device": "cpu"
+    },
+    "class_type": "LTXAVTextEncoderLoader",
+    "_meta": {
+      "title": "文字編碼器"
+    }
+  },
+  "584_01": {
+    "inputs": {
+      "image": "shot01.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot01 載入"
+    }
+  },
+  "586_01": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_01",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot01"
+    }
+  },
+  "584_02": {
+    "inputs": {
+      "image": "shot02.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot02 載入"
+    }
+  },
+  "586_02": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_02",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot02"
+    }
+  },
+  "584_03": {
+    "inputs": {
+      "image": "shot03.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot03 載入"
+    }
+  },
+  "586_03": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_03",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot03"
+    }
+  },
+  "584_04": {
+    "inputs": {
+      "image": "shot04.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot04 載入"
+    }
+  },
+  "586_04": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_04",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot04"
+    }
+  },
+  "584_05": {
+    "inputs": {
+      "image": "shot05.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot05 載入"
+    }
+  },
+  "586_05": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_05",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot05"
+    }
+  },
+  "584_06": {
+    "inputs": {
+      "image": "shot06.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot06 載入"
+    }
+  },
+  "586_06": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_06",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot06"
+    }
+  },
+  "584_07": {
+    "inputs": {
+      "image": "shot07.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot07 載入"
+    }
+  },
+  "586_07": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_07",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot07"
+    }
+  },
+  "584_08": {
+    "inputs": {
+      "image": "shot08.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot08 載入"
+    }
+  },
+  "586_08": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_08",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot08"
+    }
+  },
+  "584_09": {
+    "inputs": {
+      "image": "shot09.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot09 載入"
+    }
+  },
+  "586_09": {
+    "inputs": {
+      "img_compression": 30,
+      "image": [
+        "584_09",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot09"
+    }
+  }
+}
