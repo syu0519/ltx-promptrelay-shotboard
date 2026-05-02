@@ -2,9 +2,10 @@
 
 **A visual shot board UI for multi-segment video generation with LTX 2.3 + ComfyUI PromptRelay**
 
-> 由 [vplab 虛擬製作研習社](https://www.instagram.com/ltu_vplab/) 開發 · Ling Tung University
+> 由 [vplab 虛擬製作研習社](https://www.instagram.com/ltu_vplab/) 開發
 
----
+<img width="941" height="530" alt="syu0519_ltx-promptrelay-shotboard" src="https://github.com/user-attachments/assets/f455a9e1-bfd8-401f-9826-e6bfa6739d79" />
+
 
 ## 什麼是這個工具？
 
