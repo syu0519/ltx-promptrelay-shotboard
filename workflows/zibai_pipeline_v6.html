@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>茲白 Pipeline v6 — Shot Board</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Serif+TC:wght@300;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #07080f;
+  --bg2:      #0c0e1a;
+  --panel:    #111320;
+  --border:   #1e2235;
+  --border2:  #2a2f4a;
+  --accent:   #6c63ff;
+  --teal:     #38d9c0;
+  --gold:     #e8b84b;
+  --red:      #ff5c6a;
+  --green:    #3de8a0;
+  --text:     #dde2f5;
+  --text2:    #8890b5;
+  --text3:    #3a4060;
+  --mono:     'DM Mono', monospace;
+  --serif:    'Noto Serif TC', serif;
+  --sans:     'Syne', sans-serif;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 64px 1fr;
+  grid-template-columns: 1fr 380px;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  grid-column: 1/-1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  position: relative; z-index: 10;
+}
+.h-left { display:flex; align-items:center; gap:16px; }
+.logo-chip {
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  border-radius: 6px; padding: 4px 10px;
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 1px; color: #fff;
+}
+.h-title { font-family: var(--serif); font-size:15px; font-weight:600; letter-spacing:.5px; }
+.h-ver { font-family:var(--mono); font-size:12px; color:var(--text3); letter-spacing:2px; }
+.h-right { display:flex; align-items:center; gap:20px; }
+.conn-indicator {
+  display:flex; align-items:center; gap:6px;
+  font-family:var(--mono); font-size:13px; color:var(--text2);
+}
+.dot { width:6px; height:6px; border-radius:50%; background:var(--border2); flex-shrink:0; }
+.dot.ok  { background:var(--green); box-shadow:0 0 6px var(--green); }
+.dot.err { background:var(--red); }
+
+/* ── MAIN (left) ── */
+main {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  min-height: 0;
+  border-right: 1px solid var(--border);
+}
+
+/* SCRIPT PASTE ZONE */
+.script-zone {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.zone-label {
+  font-family:var(--mono); font-size:13px; color:var(--text3);
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:8px;
+  display:flex; align-items:center; gap:8px;
+}
+.zone-label::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+.script-textarea {
+  width:100%; background:var(--panel);
+  border:1px solid var(--border2); border-radius:6px;
+  color:var(--text); font-family:var(--mono); font-size:14px;
+  line-height:1.7; padding:12px 14px; resize:vertical;
+  min-height:110px; max-height:200px;
+  transition: border-color .2s;
+  outline:none;
+}
+.script-textarea:focus { border-color:var(--accent); }
+.script-textarea::placeholder { color:var(--text3); }
+.parse-row {
+  display:flex; gap:8px; margin-top:10px; align-items:center;
+}
+.parse-btn {
+  font-family:var(--mono); font-size:14px; font-weight:500;
+  padding:7px 18px; border-radius:5px;
+  background:var(--accent); color:#fff; border:none;
+  cursor:pointer; letter-spacing:.5px;
+  transition: opacity .2s, transform .15s;
+}
+.parse-btn:hover { opacity:.85; transform:translateY(-1px); }
+.clear-btn {
+  font-family:var(--mono); font-size:14px;
+  padding:7px 14px; border-radius:5px;
+  background:transparent; color:var(--text3);
+  border:1px solid var(--border2); cursor:pointer;
+  transition: color .2s, border-color .2s;
+}
+.clear-btn:hover { color:var(--text2); border-color:var(--border2); }
+.parse-status {
+  font-family:var(--mono); font-size:13px; color:var(--text3);
+  margin-left:auto;
+}
+.parse-status.ok { color:var(--green); }
+.parse-status.err { color:var(--red); }
+
+/* SHOT BOARD */
+.shot-board {
+  overflow-y: auto; padding:16px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-auto-rows: max-content;
+  gap:12px;
+  align-content: start;
+  min-height: 0;
+}
+.shot-board::-webkit-scrollbar { width:5px; }
+.shot-board::-webkit-scrollbar-track { background:transparent; }
+.shot-board::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+.empty-state {
+  grid-column: 1 / -1;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  min-height:200px;
+  gap:12px; opacity:.35; pointer-events:none;
+}
+.empty-icon { font-size:40px; opacity:.5; }
+.empty-text { font-family:var(--mono); font-size:14px; color:var(--text2); text-align:center; line-height:1.8; }
+
+/* SHOT CARD — vertical grid tile */
+.shot-card {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px; overflow:hidden;
+  display:flex; flex-direction:column;
+  transition: border-color .2s, transform .15s;
+  cursor:default;
+}
+.shot-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+.shot-card.has-img { border-color:var(--border2); }
+.shot-card.ready { border-color: color-mix(in srgb, var(--green) 50%, transparent); }
+
+/* 縮圖區：16:9 比例 */
+.shot-thumb {
+  position:relative; background:var(--bg);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; overflow:hidden;
+  aspect-ratio: 16 / 9;
+  width:100%;
+  border-bottom:1px solid var(--border);
+}
+.shot-thumb img {
+  width:100%; height:100%; object-fit:cover;
+  position:absolute; inset:0;
+}
+.shot-thumb-overlay {
+  position:relative; z-index:1;
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+.shot-num-badge {
+  font-family:var(--mono); font-size:13px; color:var(--text2);
+  background:rgba(7,8,15,.7); border:1px solid var(--border2);
+  border-radius:4px; padding:3px 8px; letter-spacing:1px;
+}
+.shot-thumb-icon { font-size:22px; opacity:.35; }
+.shot-thumb:hover .shot-thumb-icon { opacity:.7; }
+.shot-thumb input[type=file] {
+  position:absolute; inset:0; opacity:0; cursor:pointer; z-index:2;
+}
+.has-img .shot-thumb-overlay { display:none; }
+
+/* drag-over 高亮 */
+.shot-thumb.drag-over {
+  background: color-mix(in srgb, var(--accent) 15%, var(--bg));
+  border-bottom-color: var(--accent);
+}
+.shot-thumb.drag-over .shot-thumb-icon { opacity:1; color:var(--accent); }
+.shot-card.drag-over { border-color:var(--accent); transform:translateY(-3px); }
+.shot-thumb-hint {
+  font-family:var(--mono); font-size:10px; color:var(--text3);
+  letter-spacing:.5px; margin-top:2px; opacity:.7;
+}
+
+/* 資訊區 */
+.shot-info { padding:10px 12px; display:flex; flex-direction:column; gap:5px; }
+.shot-top { display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; }
+.shot-id {
+  font-family:var(--mono); font-size:14px; font-weight:500;
+  color:var(--accent); letter-spacing:1px;
+}
+.shot-dur {
+  font-family:var(--mono); font-size:12px; color:var(--text3);
+  margin-left:auto; white-space:nowrap;
+}
+.shot-dur span { color:var(--gold); }
+.shot-desc {
+  font-family:var(--serif); font-size:13px; color:var(--text2);
+  line-height:1.5; font-weight:300;
+}
+.shot-prompt-preview {
+  font-family:var(--mono); font-size:11px; color:var(--text3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  line-height:1.4;
+}
+.shot-dialogue {
+  font-family:var(--serif); font-size:13px;
+  color:var(--teal); font-style:italic; line-height:1.5;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.shot-dialogue::before { content:'「'; }
+.shot-dialogue::after  { content:'」'; }
+
+/* BOTTOM BAR */
+.bottom-bar {
+  padding:14px 24px;
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+  display:flex; align-items:center; gap:12px;
+}
+.stats {
+  font-family:var(--mono); font-size:14px; color:var(--text3);
+  display:flex; gap:16px;
+}
+.stats span { color:var(--text2); }
+.btn-json {
+  font-family:var(--mono); font-size:14px; font-weight:500;
+  padding:8px 20px; border-radius:5px;
+  background:transparent; color:var(--teal);
+  border:1px solid var(--teal); cursor:pointer;
+  letter-spacing:.5px;
+  transition: background .2s, color .2s;
+}
+.btn-json:hover { background:var(--teal); color:var(--bg); }
+.btn-json:disabled { opacity:.3; cursor:not-allowed; }
+.btn-send {
+  font-family:var(--mono); font-size:14px; font-weight:500;
+  padding:8px 24px; border-radius:5px;
+  background:linear-gradient(135deg, var(--accent), var(--teal));
+  color:#fff; border:none; cursor:pointer;
+  letter-spacing:.5px; margin-left:auto;
+  transition: opacity .2s, transform .15s;
+}
+.btn-send:hover:not(:disabled) { opacity:.85; transform:translateY(-1px); }
+.btn-send:disabled { opacity:.3; cursor:not-allowed; }
+
+/* ── SIDEBAR (right) ── */
+aside {
+  display:flex; flex-direction:column;
+  overflow-y:auto; background:var(--bg2);
+}
+aside::-webkit-scrollbar { width:3px; }
+aside::-webkit-scrollbar-thumb { background:var(--border); }
+
+.side-section {
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+}
+.side-label {
+  font-family:var(--mono); font-size:13px; color:var(--text3);
+  letter-spacing:2px; text-transform:uppercase; margin-bottom:12px;
+}
+.field { margin-bottom:10px; }
+.field-label {
+  font-family:var(--mono); font-size:13px; color:var(--text3);
+  letter-spacing:1px; margin-bottom:6px; display:block;
+}
+.field input, .field select, .field textarea {
+  width:100%; background:var(--panel);
+  border:1px solid var(--border2); border-radius:5px;
+  color:var(--text); font-family:var(--mono); font-size:14px;
+  padding:7px 10px; outline:none;
+  transition: border-color .2s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--accent);
+}
+.field select option { background:var(--panel); }
+.field textarea { resize:vertical; min-height:70px; line-height:1.6; font-size:13px; }
+
+.slider-row { display:flex; align-items:center; gap:8px; }
+.slider-row input[type=range] {
+  flex:1; background:transparent; height:3px;
+  accent-color:var(--accent); cursor:pointer;
+  padding:0; border:none;
+}
+.slider-val {
+  font-family:var(--mono); font-size:13px; color:var(--gold);
+  min-width:28px; text-align:right;
+}
+
+/* LOG */
+.log-section {
+  flex:1; padding:16px 20px;
+  display:flex; flex-direction:column; gap:0;
+}
+.log-area {
+  flex:1; overflow-y:auto; font-family:var(--mono);
+  font-size:13px; line-height:1.8; color:var(--text3);
+}
+.log-area::-webkit-scrollbar { width:2px; }
+.log-area::-webkit-scrollbar-thumb { background:var(--border); }
+.log-entry { padding:1px 0; }
+.log-entry.sys  { color:var(--text3); }
+.log-entry.ok   { color:var(--green); }
+.log-entry.warn { color:var(--gold); }
+.log-entry.err  { color:var(--red); }
+.log-entry.info { color:var(--text2); }
+
+/* STATUS OVERLAY */
+.status-overlay {
+  display:none; position:fixed; inset:0; z-index:50;
+  background:rgba(7,8,15,.85); backdrop-filter:blur(4px);
+  align-items:center; justify-content:center;
+}
+.status-overlay.show { display:flex; }
+.status-box {
+  background:var(--panel); border:1px solid var(--border2);
+  border-radius:12px; padding:36px 48px;
+  text-align:center; max-width:380px;
+}
+.status-box-title { font-family:var(--serif); font-size:18px; margin-bottom:8px; }
+.status-box-sub { font-family:var(--mono); font-size:14px; color:var(--text2); line-height:1.7; }
+.status-progress {
+  margin:20px 0 8px;
+  height:2px; background:var(--border);
+  border-radius:1px; overflow:hidden;
+}
+.status-progress-bar {
+  height:100%; background:linear-gradient(90deg, var(--accent), var(--teal));
+  transition:width .4s ease; width:0%;
+}
+.status-cancel {
+  font-family:var(--mono); font-size:13px; color:var(--text3);
+  background:none; border:none; cursor:pointer; margin-top:16px;
+  text-decoration:underline;
+}
+.status-cancel:hover { color:var(--text2); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="h-left">
+    <div class="logo-chip">VPLAB</div>
+    <div>
+      <div class="h-title">茲白 Pipeline</div>
+      <div class="h-ver">V6 · MULTI-GPU · 8n+1 FIX</div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="conn-indicator">
+      <div class="dot" id="comfy-dot"></div>
+      <span id="comfy-status">ComfyUI</span>
+    </div>
+    <div class="conn-indicator" style="font-size:12px;color:var(--text3);font-family:var(--mono);" id="comfy-url-display">—</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <!-- SCRIPT PASTE -->
+  <div class="script-zone">
+    <div class="zone-label">貼入 GPT 腳本</div>
+    <textarea class="script-textarea" id="script-input"
+      placeholder="貼入 GPT 生成的腳本，格式如下：
+
+[SHOT_01] duration:2.0
+prompt: Extreme low angle, white platform boots...
+dialogue: （無）
+
+[SHOT_02] duration:3.0
+prompt: Zibai walks confidently down the aisle...
+dialogue: 這邊是我們的虛擬製作與 VR 展示！"></textarea>
+    <div class="parse-row">
+      <button class="parse-btn" onclick="parseScript()">解析腳本</button>
+      <button class="clear-btn" onclick="clearAll()">清除</button>
+      <span class="parse-status" id="parse-status">等待輸入</span>
+    </div>
+  </div>
+
+  <!-- SHOT BOARD -->
+  <div class="shot-board" id="shot-board">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🎬</div>
+      <div class="empty-text">貼入腳本後按「解析腳本」<br>分鏡卡片會出現在這裡<br>點擊縮圖區域上傳對應圖片</div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="stats">
+      <div>分鏡 <span id="stat-shots">0</span></div>
+      <div>總長 <span id="stat-dur">0.0s</span></div>
+      <div>總幀 <span id="stat-frames">0</span></div>
+      <div>圖片 <span id="stat-imgs">0/0</span></div>
+    </div>
+    <button class="btn-json" id="btn-json" onclick="exportJSON()" disabled>↓ 下載 JSON</button>
+    <button class="btn-send" id="btn-send" onclick="sendToComfyUI()" disabled>▶ 送出 ComfyUI</button>
+  </div>
+</main>
+
+<!-- SIDEBAR -->
+<aside>
+  <!-- ComfyUI -->
+  <div class="side-section">
+    <div class="side-label">ComfyUI 連線</div>
+    <div class="field">
+      <label class="field-label">URL</label>
+      <input type="text" id="comfy-url" value="http://192.168.10.23:8188" oninput="checkConn()">
+    </div>
+  </div>
+
+  <!-- GPU 模式 -->
+  <div class="side-section">
+    <div class="side-label">載入模式</div>
+    <div class="field">
+      <label class="field-label">GPU 模式</label>
+      <select id="gpu-mode" onchange="onGpuModeChange()">
+        <option value="single">單卡（CheckpointLoaderSimple）</option>
+        <option value="multi" selected>雙卡（LTXV2 MultiGPU）</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 全域角色 -->
+  <div class="side-section">
+    <div class="side-label">Global Prompt（茲白角色）</div>
+    <div class="field">
+      <textarea id="global-prompt" rows="4">Zibai, young East Asian woman, silver-white hair with golden-blonde center streak, jade-teal geometric earrings, golden-amber eyes, black techwear outfit, white platform boots, cinematic realism, premium photography</textarea>
+    </div>
+  </div>
+
+  <!-- 生成參數 -->
+  <div class="side-section">
+    <div class="side-label">生成參數</div>
+    <div class="field">
+      <label class="field-label">解析度</label>
+      <select id="resolution">
+        <!-- 由 JS 動態填入 -->
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Frame Rate（格率）</label>
+      <select id="frame-rate" onchange="onFpsChange()">
+        <option value="24">24 fps（電影）</option>
+        <option value="25" selected>25 fps（PAL / 預設）</option>
+        <option value="29.97">29.97 fps（NTSC）</option>
+        <option value="30">30 fps</option>
+        <option value="60">60 fps（高影格率）</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="field-label">Steps</label>
+      <div class="slider-row">
+        <input type="range" id="steps" min="4" max="40" value="8" oninput="document.getElementById('steps-val').textContent=this.value">
+        <span class="slider-val" id="steps-val">8</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">LoRA Strength</label>
+      <div class="slider-row">
+        <input type="range" id="lora-strength" min="0.1" max="1.0" step="0.05" value="0.5"
+          oninput="document.getElementById('lora-val').textContent=parseFloat(this.value).toFixed(2)">
+        <span class="slider-val" id="lora-val">0.50</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">img_compression</label>
+      <div class="slider-row">
+        <input type="range" id="img-comp" min="0" max="50" value="30"
+          oninput="document.getElementById('comp-val').textContent=this.value">
+        <span class="slider-val" id="comp-val">30</span>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Noise Seed</label>
+      <input type="number" id="noise-seed" value="42">
+    </div>
+    <div class="field">
+      <label class="field-label">Preview Rate（每 N 步預覽）</label>
+      <div class="slider-row">
+        <input type="range" id="preview-rate" min="1" max="20" value="8"
+          oninput="document.getElementById('preview-val').textContent=this.value">
+        <span class="slider-val" id="preview-val">8</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+  <div class="log-section">
+    <div class="side-label">Log</div>
+    <div class="log-area" id="log"></div>
+  </div>
+</aside>
+
+<!-- STATUS OVERLAY -->
+<div class="status-overlay" id="status-overlay">
+  <div class="status-box">
+    <div class="status-box-title" id="overlay-title">送出中...</div>
+    <div class="status-box-sub" id="overlay-sub">正在組合 workflow JSON</div>
+    <div class="status-progress">
+      <div class="status-progress-bar" id="overlay-bar"></div>
+    </div>
+    <div id="overlay-detail" style="font-family:var(--mono);font-size:13px;color:var(--text3);margin-top:4px;"></div>
+    <button class="status-cancel" onclick="cancelSend()">取消</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────
+let shots = [];        // parsed shots
+let imgFiles = {};     // { shotId: File }
+let imgURLs = {};      // { shotId: dataURL }
+let cancelled = false;
+
+// ── LOG ──────────────────────────────────────────────────
+function log(msg, type='sys') {
+  const el = document.getElementById('log');
+  const d = document.createElement('div');
+  d.className = `log-entry ${type}`;
+  d.textContent = `${new Date().toTimeString().slice(0,8)} ${msg}`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+// ── CONNECTION ───────────────────────────────────────────
+async function checkConn() {
+  const url = document.getElementById('comfy-url').value.trim();
+  document.getElementById('comfy-url-display').textContent = url;
+  const dot = document.getElementById('comfy-dot');
+  const st  = document.getElementById('comfy-status');
+  try {
+    dot.className = 'dot';
+    const r = await fetch(`${url}/system_stats`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      dot.className = 'dot ok';
+      st.textContent = 'ComfyUI ✓';
+      log('ComfyUI 連線成功', 'ok');
+    } else throw new Error();
+  } catch {
+    dot.className = 'dot err';
+    st.textContent = 'ComfyUI ✗';
+    log('ComfyUI 連線失敗', 'err');
+  }
+}
+
+// ── FPS / FRAME HELPER ──────────────────────────────────
+function getFps() {
+  return parseFloat(document.getElementById('frame-rate').value);
+}
+// LTX 2.3 幀數規則：每個 segment 必須是 8n+1（例如 9,17,25...）
+function ltxFrames(durationSec, fps) {
+  // 單個 shot 的幀數：8n+1 對齊
+  const raw = durationSec * fps;
+  const n = Math.max(1, Math.round((raw - 1) / 8));
+  return n * 8 + 1;
+}
+function ltxTotalFrames(shots, fps) {
+  // 整部影片總幀數：所有 shot 的 8n+1 加總（segments 各自對齊）
+  return shots.reduce((s, sh) => s + ltxFrames(sh.duration, fps), 0);
+}
+function onFpsChange() {
+  updateStats();
+  if (shots.length) renderBoard();
+  log(`格率已切換為 ${getFps()} fps`, 'info');
+}
+
+// ── 解析度選項 依 GPU 模式 ──
+const RESOLUTIONS = {
+  multi: [
+    { v: '1280x720',  l: '1280 × 720（16:9 雙卡推薦）', def: true  },
+    { v: '1504x848',  l: '1504 × 848（16:9 雙卡折衷）'             },
+    { v: '848x1504',  l: '848 × 1504（9:16 雙卡直式）'             },
+    { v: '736x1280',  l: '736 × 1280（9:16 直式）'                 },
+    { v: '1024x576',  l: '1024 × 576（輕量16:9）'                  },
+    { v: '640x640',   l: '640 × 640（正方形測試）'                  },
+  ],
+  single: [
+    { v: '832x464',   l: '832 × 464（16:9 單卡推薦）', def: true  },
+    { v: '1024x576',  l: '1024 × 576（輕量16:9）'                  },
+    { v: '640x640',   l: '640 × 640（正方形測試）'                  },
+    { v: '576x1024',  l: '576 × 1024（9:16 單卡直式）'             },
+  ]
+};
+
+function updateResolutionOptions() {
+  const mode = document.getElementById('gpu-mode').value;
+  const sel  = document.getElementById('resolution');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  RESOLUTIONS[mode].forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.v;
+    opt.textContent = r.l;
+    if (r.v === prev) opt.selected = true;
+    else if (r.def && !RESOLUTIONS[mode].find(x => x.v === prev)) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  // 如果之前的值在新模式裡不存在，強制選預設
+  if (!RESOLUTIONS[mode].find(r => r.v === prev)) {
+    const def = RESOLUTIONS[mode].find(r => r.def);
+    if (def) sel.value = def.v;
+    log(`解析度已切換為 ${sel.value}`, 'info');
+  }
+}
+
+function onGpuModeChange() {
+  updateResolutionOptions();
+  log(`切換為${document.getElementById('gpu-mode').value === 'multi' ? '雙卡' : '單卡'}模式`, 'info');
+}
+
+// ── PARSE SCRIPT ─────────────────────────────────────────
+function parseScript() {
+  const raw = document.getElementById('script-input').value.trim();
+  if (!raw) { setStatus('請先貼入腳本', 'err'); return; }
+
+  // 切分 [SHOT_xx] 區塊
+  const blocks = raw.split(/(?=\[SHOT_\d+\])/i).filter(b => b.trim());
+  if (!blocks.length) {
+    setStatus('找不到 [SHOT_xx] 格式', 'err');
+    log('解析失敗：找不到 [SHOT_xx] 標記', 'err');
+    return;
+  }
+
+  const parsed = [];
+  for (const block of blocks) {
+    const idMatch  = block.match(/\[SHOT_(\d+)\]/i);
+    const durMatch = block.match(/duration\s*[:：]\s*([\d.]+)/i);
+    const promptMatch = block.match(/prompt\s*[:：]\s*(.+?)(?=\n(?:dialogue|desc|duration|\[SHOT)|$)/is);
+    const dialogueMatch = block.match(/dialogue\s*[:：]\s*(.+?)(?=\n(?:prompt|desc|duration|\[SHOT)|$)/is);
+    const descMatch = block.match(/desc\s*[:：]\s*(.+?)(?=\n(?:prompt|dialogue|duration|\[SHOT)|$)/is);
+
+    if (!idMatch) continue;
+
+    const id       = parseInt(idMatch[1]);
+    const duration = durMatch ? parseFloat(durMatch[1]) : 3.0;
+    const prompt   = promptMatch ? promptMatch[1].trim() : '';
+    const dialogue = dialogueMatch ? dialogueMatch[1].trim().replace(/（無）|^\s*$/, '') : '';
+    const desc     = descMatch ? descMatch[1].trim() : `Shot ${String(id).padStart(2,'0')}`;
+
+    parsed.push({ id, duration, prompt, dialogue, desc });
+  }
+
+  if (!parsed.length) {
+    setStatus('解析失敗，請確認格式', 'err');
+    return;
+  }
+
+  shots = parsed.sort((a,b) => a.id - b.id);
+  imgFiles = {};
+  imgURLs  = {};
+  renderBoard();
+  updateStats();
+  setStatus(`✓ 解析完成：${shots.length} 個分鏡`, 'ok');
+  log(`解析腳本：${shots.length} 個分鏡`, 'ok');
+  updateButtons();
+}
+
+function setStatus(msg, type='') {
+  const el = document.getElementById('parse-status');
+  el.textContent = msg;
+  el.className = `parse-status ${type}`;
+}
+
+// ── RENDER BOARD ─────────────────────────────────────────
+function renderBoard() {
+  const board = document.getElementById('shot-board');
+  const empty = document.getElementById('empty-state');
+  empty.style.display = shots.length ? 'none' : 'flex';
+
+  // remove old cards
+  board.querySelectorAll('.shot-card').forEach(c => c.remove());
+
+  shots.forEach(shot => {
+    const card = document.createElement('div');
+    const shotKey = `shot_${shot.id}`;
+    card.className = 'shot-card' + (imgURLs[shotKey] ? ' has-img' : '');
+    card.id = `card-${shot.id}`;
+
+    card.innerHTML = `
+      <div class="shot-thumb" id="thumb-${shot.id}" onclick="triggerUpload(${shot.id})">
+        ${imgURLs[shotKey] ? `<img src="${imgURLs[shotKey]}" alt="">` : ''}
+        <div class="shot-thumb-overlay">
+          <div class="shot-num-badge">SHOT ${String(shot.id).padStart(2,'0')}</div>
+          <div class="shot-thumb-icon">${imgURLs[shotKey] ? '✎' : '＋'}</div>
+          ${!imgURLs[shotKey] ? '<div class="shot-thumb-hint">點擊或拖曳圖片</div>' : ''}
+        </div>
+        <input type="file" accept="image/*" id="file-${shot.id}"
+          onchange="handleImgUpload(${shot.id}, this)" style="display:none">
+      </div>
+      <div class="shot-info">
+        <div class="shot-top">
+          <span class="shot-id">SHOT ${String(shot.id).padStart(2,'0')}</span>
+          <span class="shot-dur"><span>${shot.duration}s</span> · ${ltxFrames(shot.duration, getFps())}f @ ${getFps()}fps</span>
+        </div>
+        ${shot.desc ? `<div class="shot-desc">${shot.desc}</div>` : ''}
+        ${shot.prompt ? `<div class="shot-prompt-preview">${shot.prompt.slice(0,80)}${shot.prompt.length>80?'…':''}</div>` : ''}
+        ${shot.dialogue ? `<div class="shot-dialogue">${shot.dialogue}</div>` : ''}
+      </div>
+    `;
+    board.appendChild(card);
+
+    // drag & drop
+    const thumb = card.querySelector('.shot-thumb');
+    thumb.addEventListener('dragover', e => {
+      e.preventDefault(); e.stopPropagation();
+      thumb.classList.add('drag-over');
+      card.classList.add('drag-over');
+    });
+    thumb.addEventListener('dragleave', e => {
+      thumb.classList.remove('drag-over');
+      card.classList.remove('drag-over');
+    });
+    thumb.addEventListener('drop', e => {
+      e.preventDefault(); e.stopPropagation();
+      thumb.classList.remove('drag-over');
+      card.classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        loadImageFile(shot.id, file);
+      } else {
+        log(`Shot ${String(shot.id).padStart(2,'0')} 拖曳的不是圖片`, 'warn');
+      }
+    });
+  });
+}
+
+function triggerUpload(id) {
+  document.getElementById(`file-${id}`).click();
+}
+
+function handleImgUpload(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+  loadImageFile(id, file);
+}
+
+function loadImageFile(id, file) {
+  const shotKey = `shot_${id}`;
+  imgFiles[shotKey] = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imgURLs[shotKey] = e.target.result;
+    renderBoard();
+    updateStats();
+    updateButtons();
+    log(`Shot ${String(id).padStart(2,'0')} 圖片已載入：${file.name}`, 'info');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── STATS ────────────────────────────────────────────────
+function updateStats() {
+  const totalDur    = shots.reduce((s,sh) => s+sh.duration, 0);
+  const totalFrames = ltxTotalFrames(shots, getFps());
+  const imgCount    = Object.keys(imgFiles).length;
+  document.getElementById('stat-shots').textContent  = shots.length;
+  document.getElementById('stat-dur').textContent    = totalDur.toFixed(1)+'s';
+  document.getElementById('stat-frames').textContent = totalFrames;
+  document.getElementById('stat-imgs').textContent   = `${imgCount}/${shots.length}`;
+}
+
+function updateButtons() {
+  const hasShots = shots.length > 0;
+  document.getElementById('btn-json').disabled = !hasShots;
+  document.getElementById('btn-send').disabled = !hasShots;
+}
+
+// ── BUILD WORKFLOW JSON ───────────────────────────────────
+function buildWorkflow() {
+  const globalPrompt   = document.getElementById('global-prompt').value.trim();
+  const fps            = getFps();
+  const isMultiGPU     = document.getElementById('gpu-mode').value === 'multi';
+  const loraStrength   = parseFloat(document.getElementById('lora-strength').value);
+
+  // loader nodes 依 GPU 模式切換
+  const loaderNodes = isMultiGPU ? {
+    "616": { "inputs": { "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors", "device": "cuda:0" }, "class_type": "LTXV2CheckpointLoaderMultiGPU", "_meta": { "title": "主模型 MultiGPU" } },
+    "615": { "inputs": { "lora_name": "ltx-2.3-22b-distilled-lora-384.safetensors", "strength_model": loraStrength, "model": ["616",0] }, "class_type": "LoraLoaderModelOnly", "_meta": { "title": "Distilled LoRA" } },
+    "614": { "inputs": { "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors" }, "class_type": "LTXV2AudioVAELoaderMultiGPU", "_meta": { "title": "Audio VAE MultiGPU" } }
+  } : {
+    "610": { "inputs": { "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors" }, "class_type": "CheckpointLoaderSimple", "_meta": { "title": "主模型" } },
+    "611": { "inputs": { "lora_name": "ltx-2.3-22b-distilled-lora-384.safetensors", "strength_model": loraStrength, "model": ["610",0] }, "class_type": "LoraLoaderModelOnly", "_meta": { "title": "Distilled LoRA" } },
+    "612": { "inputs": { "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors" }, "class_type": "LTXVAudioVAELoader", "_meta": { "title": "Audio VAE" } }
+  };
+
+  // node ID 依模式對應
+  const ckptId    = isMultiGPU ? "616" : "610";
+  const loraId    = isMultiGPU ? "615" : "611";
+  const audioVaeId= isMultiGPU ? "614" : "612";
+  const vaeOutIdx = isMultiGPU ? 1 : 2;  // MultiGPU loader VAE output = index 1, Single = index 2
+  const [w, h]         = document.getElementById('resolution').value.split('x').map(Number);
+  const steps          = parseInt(document.getElementById('steps').value);
+  const imgComp        = parseInt(document.getElementById('img-comp').value);
+  const noiseSeed      = parseInt(document.getElementById('noise-seed').value);
+
+  const totalFrames    = ltxTotalFrames(shots, fps);
+  const segLengths     = shots.map(sh => ltxFrames(sh.duration, fps)).join(', ');
+
+  // build segments for timeline_data
+  const segments = shots.map((sh, i) => ({
+    prompt: sh.prompt + (sh.dialogue ? `, speaking in Mandarin Chinese, she says: "${sh.dialogue}"` : ''),
+    length: ltxFrames(sh.duration, fps),
+    color: ['#4f8edc','#e07b3a','#9b59b6','#d9534f','#5cb85c','#f39c12','#1abc9c','#e74c3c','#3498db','#e67e22','#2ecc71','#e91e63','#00bcd4','#ff5722'][i % 14]
+  }));
+  const timelineData = JSON.stringify({ segments });
+
+  // base nodes (fixed)
+  const wf = {
+    "154": { "inputs": { "sampler_name": "euler_ancestral_cfg_pp" }, "class_type": "KSamplerSelect", "_meta": { "title": "K采样器选择" } },
+    "164": { "inputs": { "frame_rate": fps, "positive": ["607",1], "negative": ["420",0] }, "class_type": "LTXVConditioning", "_meta": { "title": "LTXV条件" } },
+    "358": { "inputs": { "start_step": 0, "end_step": -1, "sigmas": ["514",0] }, "class_type": "VisualizeSigmasKJ", "_meta": { "title": "VisualizeSigmasKJ" } },
+    "420": { "inputs": { "conditioning": ["607",1] }, "class_type": "ConditioningZeroOut", "_meta": { "title": "条件零化" } },
+    "471": { "inputs": { "samples": ["549",0], "vae": [ckptId,vaeOutIdx] }, "class_type": "VAEDecode", "_meta": { "title": "VAE解码" } },
+    "514": { "inputs": { "scheduler": "linear_quadratic", "steps": steps, "denoise": 1, "model": ["542",0] }, "class_type": "BasicScheduler", "_meta": { "title": "基本调度器" } },
+    "542": { "inputs": { "sage_attention": "disabled", "allow_compile": false, "model": [loraId,0] }, "class_type": "PathchSageAttentionKJ", "_meta": { "title": "Patch Sage Attention KJ" } },
+    "547": { "inputs": { "frames_number": totalFrames, "frame_rate": fps, "batch_size": 1, "audio_vae": [audioVaeId,0] }, "class_type": "LTXVEmptyLatentAudio", "_meta": { "title": "LTXV 空音频潜空间" } },
+    "548": { "inputs": { "video_latent": ["582",0], "audio_latent": ["547",0] }, "class_type": "LTXVConcatAVLatent", "_meta": { "title": "LTXVConcatAVLatent" } },
+    "549": { "inputs": { "av_latent": ["561",0] }, "class_type": "LTXVSeparateAVLatent", "_meta": { "title": "LTXV分离音视频潜空间" } },
+    "550": { "inputs": { "samples": ["549",1], "audio_vae": [audioVaeId,0] }, "class_type": "LTXVAudioVAEDecode", "_meta": { "title": "LTXV音频VAE解码" } },
+    "561": { "inputs": { "add_noise": true, "noise_seed": noiseSeed, "cfg": 1, "model": ["588",0], "positive": ["164",0], "negative": ["164",1], "sampler": ["154",0], "sigmas": ["358",0], "latent_image": ["548",0] }, "class_type": "SamplerCustom", "_meta": { "title": "自定义采样器" } },
+    "562": { "inputs": { "images": ["358",1] }, "class_type": "PreviewImage", "_meta": { "title": "预览图像" } },
+    "577": { "inputs": { "width": w, "height": h, "length": totalFrames, "batch_size": 1 }, "class_type": "EmptyLTXVLatentVideo", "_meta": { "title": `空Latent ${w}x${h} ${totalFrames}幀 @${fps}fps` } },
+    "588": { "inputs": { "preview_rate": parseInt(document.getElementById('preview-rate').value), "model": ["607",0] }, "class_type": "LTX2SamplingPreviewOverride", "_meta": { "title": "LTX2 Sampling Preview Override" } },
+    "604": { "inputs": { "frame_rate": fps, "loop_count": 0, "filename_prefix": "ltx23_zibai", "format": "video/h264-mp4", "pix_fmt": "yuv420p", "crf": 19, "save_metadata": true, "trim_to_audio": false, "pingpong": false, "save_output": true, "images": ["471",0], "audio": ["550",0] }, "class_type": "VHS_VideoCombine", "_meta": { "title": "輸出 MP4" } },
+    ...loaderNodes,
+    "613": { "inputs": { "text_encoder": "gemma_3_12B_it_fp4_mixed.safetensors", "ckpt_name": "ltx-2.3-22b-dev-fp8.safetensors", "device": "cpu" }, "class_type": "LTXAVTextEncoderLoader", "_meta": { "title": "文字編碼器" } }
+  };
+
+  // PromptRelay node
+  wf["607"] = {
+    "inputs": {
+      "global_prompt": globalPrompt,
+      "max_frames": totalFrames,
+      "timeline_data": timelineData,
+      "local_prompts": segments.map(s=>s.prompt).join(' | '),
+      "segment_lengths": segLengths,
+      "epsilon": 0.001,
+      "fps": fps,
+      "time_units": "frames",
+      "model": ["542",0],
+      "clip": ["613",0],
+      "latent": ["577",0]
+    },
+    "class_type": "PromptRelayEncodeTimeline",
+    "_meta": { "title": `Prompt Relay ${shots.length}段分鏡` }
+  };
+
+  // dynamic: LTXVImgToVideoInplaceKJ
+  const inplaceInputs = {
+    "num_images": String(shots.length),
+    "vae": [ckptId,vaeOutIdx],
+    "latent": ["577",0]
+  };
+
+  let currentFrame = 0;
+  shots.forEach((sh, i) => {
+    const n = i + 1;
+    const shotKey = `shot_${sh.id}`;
+    inplaceInputs[`num_images.strength_${n}`] = 1;
+    inplaceInputs[`num_images.index_${n}`] = currentFrame;
+    inplaceInputs[`num_images.image_${n}`] = [`586_${String(sh.id).padStart(2,'0')}`, 0];
+    currentFrame += ltxFrames(sh.duration, fps);
+  });
+  wf["582"] = { "inputs": inplaceInputs, "class_type": "LTXVImgToVideoInplaceKJ", "_meta": { "title": `多圖錨定 ${shots.length}張` } };
+
+  // dynamic: LoadImage + LTXVPreprocess per shot
+  shots.forEach(sh => {
+    const pad  = String(sh.id).padStart(2,'0');
+    const loadId = `584_${pad}`;
+    const prepId = `586_${pad}`;
+    const fname  = `shot${pad}.png`;
+
+    wf[loadId] = { "inputs": { "image": fname }, "class_type": "LoadImage", "_meta": { "title": `Shot${pad} 載入` } };
+    wf[prepId] = { "inputs": { "img_compression": imgComp, "image": [loadId, 0] }, "class_type": "LTXVPreprocess", "_meta": { "title": `LTXV預處理 Shot${pad}` } };
+  });
+
+  return wf;
+}
+
+// ── EXPORT JSON ───────────────────────────────────────────
+function exportJSON() {
+  if (!shots.length) return;
+  const wf = buildWorkflow();
+  const blob = new Blob([JSON.stringify(wf, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `zibai_pipeline_${shots.length}shots.json`;
+  a.click(); URL.revokeObjectURL(url);
+  log(`JSON 已下載：${shots.length} 個分鏡`, 'ok');
+
+  // also log required filenames
+  log(`ComfyUI input 資料夾需要：`, 'info');
+  shots.forEach(sh => log(`  shot${String(sh.id).padStart(2,'0')}.png`, 'sys'));
+}
+
+// ── SEND TO COMFYUI ───────────────────────────────────────
+async function sendToComfyUI() {
+  if (!shots.length) return;
+  cancelled = false;
+
+  const comfyUrl = document.getElementById('comfy-url').value.trim();
+  showOverlay('送出到 ComfyUI', '正在上傳圖片並組合 workflow...', 0);
+  log('開始送出 ComfyUI...', 'ok');
+
+  try {
+    // 1. upload images that user has selected
+    const imgCount = Object.keys(imgFiles).length;
+    if (imgCount > 0) {
+      let uploaded = 0;
+      for (const [shotKey, file] of Object.entries(imgFiles)) {
+        if (cancelled) throw new Error('已取消');
+        const id  = shotKey.replace('shot_', '');
+        const pad = String(parseInt(id)).padStart(2,'0');
+        const fname = `shot${pad}.png`;
+
+        updateOverlay(`上傳圖片 ${fname}`, (uploaded/imgCount)*60);
+
+        const formData = new FormData();
+        formData.append('image', file, fname);
+        formData.append('overwrite', 'true');
+
+        const r = await fetch(`${comfyUrl}/upload/image`, { method:'POST', body: formData });
+        if (!r.ok) throw new Error(`上傳失敗：${fname}`);
+        log(`圖片上傳：${fname} ✓`, 'ok');
+        uploaded++;
+      }
+    }
+
+    if (cancelled) throw new Error('已取消');
+
+    // 2. build & send workflow
+    updateOverlay('組合 Workflow JSON', 70);
+    const wf = buildWorkflow();
+
+    updateOverlay('送出生成任務', 85);
+    const r = await fetch(`${comfyUrl}/prompt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: wf })
+    });
+    if (!r.ok) throw new Error(`ComfyUI 回應錯誤：${r.status}`);
+
+    const data = await r.json();
+    const promptId = data.prompt_id;
+    updateOverlay('任務已送出 ✓', 100);
+    log(`任務 ID：${promptId}`, 'ok');
+    log(`共 ${shots.length} 個分鏡，總幀數 ${ltxTotalFrames(shots, getFps())}，格率 ${getFps()} fps`, 'info');
+
+    setTimeout(hideOverlay, 1500);
+
+  } catch(err) {
+    hideOverlay();
+    log(`錯誤：${err.message}`, 'err');
+  }
+}
+
+function cancelSend() { cancelled = true; hideOverlay(); log('已取消', 'warn'); }
+
+function showOverlay(title, sub, pct) {
+  document.getElementById('overlay-title').textContent = title;
+  document.getElementById('overlay-sub').textContent = sub;
+  document.getElementById('overlay-bar').style.width = pct + '%';
+  document.getElementById('status-overlay').classList.add('show');
+}
+function updateOverlay(sub, pct) {
+  document.getElementById('overlay-sub').textContent = sub;
+  document.getElementById('overlay-bar').style.width = pct + '%';
+}
+function hideOverlay() {
+  document.getElementById('status-overlay').classList.remove('show');
+}
+
+// ── CLEAR ────────────────────────────────────────────────
+function clearAll() {
+  shots = []; imgFiles = {}; imgURLs = {};
+  document.getElementById('script-input').value = '';
+  document.getElementById('shot-board').querySelectorAll('.shot-card').forEach(c=>c.remove());
+  document.getElementById('empty-state').style.display = 'flex';
+  setStatus('已清除', '');
+  updateStats(); updateButtons();
+  log('已清除所有分鏡', 'sys');
+}
+
+// ── INIT ─────────────────────────────────────────────────
+updateResolutionOptions();
+checkConn();
+setInterval(checkConn, 20000);
+log('茲白 Pipeline v6 初始化完成', 'ok');
+log('請貼入 GPT 腳本後按「解析腳本」', 'sys');
+</script>
+
+<!-- GPT SYSTEM PROMPT (隱藏區，方便複製) -->
+<!--
+=== GPT System Prompt for 茲白腳本 ===
+
+你是茲白影片腳本生成器。收到場景概念後，輸出符合以下格式的分鏡腳本。
+
+茲白固定視覺特徵（每個 prompt 都必須包含）：
+- silver-white hair with golden-blonde center streak
+- jade-teal geometric stud earrings
+- golden-amber eyes
+- black techwear outfit, white chunky platform boots
+
+輸出格式（嚴格遵守）：
+
+[SHOT_01] duration:2.0
+desc: 中文場景描述（30字內）
+prompt: English LTX 2.3 prompt, cinematic realism, camera movement, subject action, lighting
+dialogue: （無）或 中文對白
+
+[SHOT_02] duration:3.5
+desc: ...
+prompt: ...
+dialogue: ...
+
+規則：
+1. duration 單位為秒，範圍 1.5~5.0
+2. 總時長控制在 15~20 秒
+3. 分鏡數量 7~14 個
+4. prompt 必須是英文，包含：鏡頭景別、運鏡、角色動作、光線、場景細節
+5. 如有對白，在 prompt 中加入 speaking in Mandarin Chinese, she says: "..."
+6. 每個 shot 之間空一行
+7. 不要輸出任何其他說明文字，只輸出分鏡腳本
+-->
+</body>
+</html>
