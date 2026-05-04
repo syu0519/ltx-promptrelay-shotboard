@@ -37,7 +37,7 @@
 - 🖱️ **拖曳上傳圖片** — 點擊或拖放圖片到縮圖區
 - ⚙️ **格率選擇** — 24 / 25 / 29.97 / 30 / 60 fps，幀數自動重算
 - 🎛️ **參數面板** — 解析度、Steps、LoRA Strength、img_compression、Noise Seed
-- 🖥️ **單卡 / 雙卡模式切換** — 自動切換 loader nodes 和對應解析度選單
+- 🖥️ **GGUF 單卡 / FP8 單卡 / 雙卡模式切換** — 自動切換 loader nodes 和對應解析度選單
 - 📡 **直接送 ComfyUI** — 自動上傳圖片 + 送出 workflow，一鍵完成
 - 💾 **下載 JSON** — 匯出可直接丟進 ComfyUI 的 workflow 檔案
 
@@ -47,7 +47,7 @@
 
 ### 1. 下載工具
 
-直接下載 [([zibai_pipeline_v7.html](https://syu0519.github.io/ltx-promptrelay-shotboard/workflows/zibai_pipeline_v7.html)`])，**不需要安裝任何東西**，瀏覽器直接打開。
+直接下載 [`zibai_pipeline_v8.html`](https://github.com/syu0519/ltx-promptrelay-shotboard/blob/main/zibai_pipeline_v8.html)，**不需要安裝任何東西**，瀏覽器直接打開。
 
 ### 2. 安裝 ComfyUI 必要節點
 
@@ -210,10 +210,41 @@ python fix_kjnodes.py
 
 | 檔案 | 說明 |
 |------|------|
-| `workflow_single_gpu.json` | 單卡參考 workflow（640×640，測試用） |
-| `workflow_multi_gpu.json` | 雙卡 1280×720，Multi-GPU（dual RTX 3090） |
+| `workflows/workflow_single_gpu_gguf.json` | GGUF 單卡，480×832（直式），8 分鏡，RTX 4060 8GB 驗證 |
+| `workflows/workflow_multi_gpu.json` | 雙卡 1280×720，Multi-GPU（dual RTX 3090） |
+| `workflows/workflow_single_gpu.json` | FP8 單卡參考（640×640，測試用） |
 
-Multi-GPU 版使用 `LTXV2CheckpointLoaderMultiGPU` 和 `LTXV2AudioVAELoaderMultiGPU`，需要雙卡環境（如 dual RTX 3090）。
+---
+
+## GGUF 單卡模式（v8 新增）
+
+適合 VRAM 8GB 的單卡環境（RTX 4060 / RTX 3060 等），使用 GGUF Q4_K_M 量化模型，在 RTX 4060 8GB + 32GB RAM 環境下，561 幀 832×480 約 676 秒完成。
+
+### 額外需要的節點
+
+```bash
+cd ComfyUI/custom_nodes
+
+# ComfyUI-GGUF（GGUF 模式必要）
+git clone https://github.com/city96/ComfyUI-GGUF
+```
+
+### 額外需要的模型
+
+| 檔案 | 位置 |
+|------|------|
+| `ltx-2.3-22b-dev-Q4_K_M.gguf` | `unet/` |
+| `gemma-3-12b-it-qat-UD-Q4_K_XL.gguf` | `text_encoders/` |
+| `ltx-2.3-22b-dev_embeddings_connectors.safetensors` | `text_encoders/` |
+| `ltx-2.3-22b-dev_video_vae.safetensors` | `vae/` |
+| `ltx-2.3-22b-dev_audio_vae.safetensors` | `vae/` |
+
+### GGUF 模式特性
+
+- 解析度固定：`832×480`（橫）/ `480×832`（直）
+- VAEDecodeTiled 自動啟用（tile=256, overlap=32），避免 OOM
+- Node 588（`LTX2SamplingPreviewOverride`）自動移除，修正透過 API 送出時的 NoneType crash
+- JSON 檔名自動帶模式標記：`zibai_pipeline_gguf_Nshots.json`
 
 ---
 
@@ -222,7 +253,7 @@ Multi-GPU 版使用 `LTXV2CheckpointLoaderMultiGPU` 和 `LTXV2AudioVAELoaderMult
 茲白是 vplab 的原創虛擬角色：
 
 - 銀白短髮，中間一縷金色挑染
-- 玉色幾何耳環、琥珀金色眼睛  
+- 玉色幾何耳環、琥珀金色眼睛
 - 黑色 Techwear 裝束、白色厚底靴
 
 Global Prompt 欄位可以換成任何角色描述，**工具本身完全通用**。
@@ -233,6 +264,7 @@ Global Prompt 欄位可以換成任何角色描述，**工具本身完全通用*
 
 - [ComfyUI-PromptRelay](https://github.com/kijai/ComfyUI-PromptRelay) — kijai
 - [ComfyUI-KJNodes](https://github.com/kijai/ComfyUI-KJNodes) — kijai
+- [ComfyUI-GGUF](https://github.com/city96/ComfyUI-GGUF) — city96
 - [LTX-Video](https://github.com/Lightricks/LTX-Video) — Lightricks
 - [vplab Instagram](https://www.instagram.com/ltu_vplab/)
 
