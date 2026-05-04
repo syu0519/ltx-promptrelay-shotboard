@@ -1,0 +1,572 @@
+{
+  "154": {
+    "inputs": {
+      "sampler_name": "euler_ancestral_cfg_pp"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "K采样器选择"
+    }
+  },
+  "164": {
+    "inputs": {
+      "frame_rate": 24,
+      "positive": [
+        "607",
+        1
+      ],
+      "negative": [
+        "420",
+        0
+      ]
+    },
+    "class_type": "LTXVConditioning",
+    "_meta": {
+      "title": "LTXV条件"
+    }
+  },
+  "358": {
+    "inputs": {
+      "start_step": 0,
+      "end_step": -1,
+      "sigmas": [
+        "514",
+        0
+      ]
+    },
+    "class_type": "VisualizeSigmasKJ",
+    "_meta": {
+      "title": "VisualizeSigmasKJ"
+    }
+  },
+  "420": {
+    "inputs": {
+      "conditioning": [
+        "607",
+        1
+      ]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "条件零化"
+    }
+  },
+  "471": {
+    "inputs": {
+      "samples": [
+        "549",
+        0
+      ],
+      "vae": [
+        "616",
+        0
+      ],
+      "tile_size": 256,
+      "overlap": 32,
+      "temporal_size": 64,
+      "temporal_overlap": 8
+    },
+    "class_type": "VAEDecodeTiled",
+    "_meta": {
+      "title": "VAE解码 Tiled（GGUF）"
+    }
+  },
+  "514": {
+    "inputs": {
+      "scheduler": "linear_quadratic",
+      "steps": 8,
+      "denoise": 1,
+      "model": [
+        "542",
+        0
+      ]
+    },
+    "class_type": "BasicScheduler",
+    "_meta": {
+      "title": "基本调度器"
+    }
+  },
+  "542": {
+    "inputs": {
+      "sage_attention": "disabled",
+      "allow_compile": false,
+      "model": [
+        "621",
+        0
+      ]
+    },
+    "class_type": "PathchSageAttentionKJ",
+    "_meta": {
+      "title": "Patch Sage Attention KJ"
+    }
+  },
+  "547": {
+    "inputs": {
+      "frames_number": 496,
+      "frame_rate": 24,
+      "batch_size": 1,
+      "audio_vae": [
+        "615",
+        0
+      ]
+    },
+    "class_type": "LTXVEmptyLatentAudio",
+    "_meta": {
+      "title": "LTXV 空音频潜空间"
+    }
+  },
+  "548": {
+    "inputs": {
+      "video_latent": [
+        "582",
+        0
+      ],
+      "audio_latent": [
+        "547",
+        0
+      ]
+    },
+    "class_type": "LTXVConcatAVLatent",
+    "_meta": {
+      "title": "LTXVConcatAVLatent"
+    }
+  },
+  "549": {
+    "inputs": {
+      "av_latent": [
+        "561",
+        0
+      ]
+    },
+    "class_type": "LTXVSeparateAVLatent",
+    "_meta": {
+      "title": "LTXV分离音视频潜空间"
+    }
+  },
+  "550": {
+    "inputs": {
+      "samples": [
+        "549",
+        1
+      ],
+      "audio_vae": [
+        "615",
+        0
+      ]
+    },
+    "class_type": "LTXVAudioVAEDecode",
+    "_meta": {
+      "title": "LTXV音频VAE解码"
+    }
+  },
+  "561": {
+    "inputs": {
+      "add_noise": true,
+      "noise_seed": 2281094970,
+      "cfg": 1,
+      "model": [
+        "607",
+        0
+      ],
+      "positive": [
+        "164",
+        0
+      ],
+      "negative": [
+        "164",
+        1
+      ],
+      "sampler": [
+        "154",
+        0
+      ],
+      "sigmas": [
+        "358",
+        0
+      ],
+      "latent_image": [
+        "548",
+        0
+      ]
+    },
+    "class_type": "SamplerCustom",
+    "_meta": {
+      "title": "自定义采样器"
+    }
+  },
+  "562": {
+    "inputs": {
+      "images": [
+        "358",
+        1
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "577": {
+    "inputs": {
+      "width": 480,
+      "height": 832,
+      "length": 496,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLTXVLatentVideo",
+    "_meta": {
+      "title": "空Latent 480x832 496幀 @24fps"
+    }
+  },
+  "582": {
+    "inputs": {
+      "num_images": "8",
+      "vae": [
+        "616",
+        0
+      ],
+      "latent": [
+        "577",
+        0
+      ],
+      "num_images.strength_1": 0.7,
+      "num_images.index_1": 0,
+      "num_images.image_1": [
+        "586_01",
+        0
+      ],
+      "num_images.strength_2": 0.7,
+      "num_images.index_2": 57,
+      "num_images.image_2": [
+        "586_02",
+        0
+      ],
+      "num_images.strength_3": 0.7,
+      "num_images.index_3": 114,
+      "num_images.image_3": [
+        "586_03",
+        0
+      ],
+      "num_images.strength_4": 0.7,
+      "num_images.index_4": 171,
+      "num_images.image_4": [
+        "586_04",
+        0
+      ],
+      "num_images.strength_5": 0.7,
+      "num_images.index_5": 220,
+      "num_images.image_5": [
+        "586_05",
+        0
+      ],
+      "num_images.strength_6": 0.7,
+      "num_images.index_6": 293,
+      "num_images.image_6": [
+        "586_06",
+        0
+      ],
+      "num_images.strength_7": 0.7,
+      "num_images.index_7": 350,
+      "num_images.image_7": [
+        "586_07",
+        0
+      ],
+      "num_images.strength_8": 0.7,
+      "num_images.index_8": 423,
+      "num_images.image_8": [
+        "586_08",
+        0
+      ]
+    },
+    "class_type": "LTXVImgToVideoInplaceKJ",
+    "_meta": {
+      "title": "多圖錨定 8張"
+    }
+  },
+  "604": {
+    "inputs": {
+      "frame_rate": 24,
+      "loop_count": 0,
+      "filename_prefix": "ltx23_zibai",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 19,
+      "save_metadata": true,
+      "trim_to_audio": false,
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "471",
+        0
+      ],
+      "audio": [
+        "550",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "輸出 MP4"
+    }
+  },
+  "607": {
+    "inputs": {
+      "global_prompt": "Amy, an East Asian female image creator from the world before disappearance, around 25–30 years old, gentle and quiet presence, not designed or polished, but like someone preserved by old light. Natural black or dark brown medium-length hair, slightly messy with soft natural waves, no precise styling. Bare-faced natural look, faint under-eye shadows, soft yet attentive eyes, as if she is always observing small details in daily life. She wears textured but imperfect clothing: an old cotton-linen shirt, slightly wrinkled off-white inner layer, and a dark brown or olive work jacket with visible fabric creases and subtle signs of use, not perfectly tailored. She always has an analog recording object nearby, such as a film camera, old camcorder, or notebook. Warm film tone, warm white light, subtle film grain, slight overexposure, 35mm film still, imperfect and tactile. She is usually not fully sharp, often appearing at the edge of focus, inside lens flare, near window backlight, or as a soft visual afterimage; if she appears too clear, it feels wrong.",
+      "max_frames": 496,
+      "timeline_data": "{\"segments\":[{\"prompt\":\"Vertical 9:16, medium close-up, cinematic photorealism, a cute young East Asian woman with a short black bob haircut, straight bangs, round black glasses, wearing a beige oversized hoodie with dark navy hood lining and a light casual jacket, sitting on her bed in a cozy morning bedroom, holding her smartphone, warm sunlight streaming through the window, soft shallow depth of field, gentle push-in camera movement, she looks sleepy but curious, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"我昨天才買到一隻耶，真的有滿足。\\\", speaking in Mandarin Chinese, she says: \\\"我昨天才買到一隻耶，真的有滿足。\\\"\",\"length\":57,\"color\":\"#4f8edc\"},{\"prompt\":\"Vertical 9:16, close-up, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, holding her smartphone closer to camera, eyes widening as she sees a McDonald’s x Gundam notification saying only a few are left, warm bedroom light mixed with soft screen glow, shallow depth of field, slight tilt-down camera movement following the phone, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"可是我剛剛看到，剩下最後幾隻而已。\\\", speaking in Mandarin Chinese, she says: \\\"可是我剛剛看到，剩下最後幾隻而已。\\\"\",\"length\":57,\"color\":\"#e07b3a\"},{\"prompt\":\"Vertical 9:16, medium shot, cinematic photorealism, the same young East Asian woman with short black bob haircut, straight bangs, round black glasses, beige oversized hoodie with dark navy hood lining and light casual jacket, quickly grabbing her bag and phone beside the bed, standing up in a cozy bedroom, warm morning light, shallow depth of field, quick lateral camera move, she looks flustered but excited, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"我只是想去確認一下啦，不是要買喔。\\\", speaking in Mandarin Chinese, she says: \\\"我只是想去確認一下啦，不是要買喔。\\\"\",\"length\":57,\"color\":\"#9b59b6\"},{\"prompt\":\"Vertical 9:16, medium full shot from behind, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, walking toward the entrance of a McDonald’s restaurant while holding her phone, glowing McDonald’s sign above, warm indoor light spilling outward, shallow depth of field, handheld forward tracking movement, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"真的，我只是來看一下而已。\\\", speaking in Mandarin Chinese, she says: \\\"真的，我只是來看一下而已。\\\"\",\"length\":49,\"color\":\"#d9534f\"},{\"prompt\":\"Vertical 9:16, medium shot, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, standing beside a McDonald’s display case, looking at two Gundam toys standing side by side, one dark gray Blade version and one red-white Striker version, warm restaurant lighting, soft reflections on glass, shallow depth of field, slow push-in camera movement, her face brightens with surprise and delight, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"可是它們站在一起的時候，真的好可愛喔。\\\", speaking in Mandarin Chinese, she says: \\\"可是它們站在一起的時候，真的好可愛喔。\\\"\",\"length\":73,\"color\":\"#5cb85c\"},{\"prompt\":\"Vertical 9:16, close-up, cinematic photorealism, the same young East Asian woman with short black bob haircut, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, leaning slightly forward at the table, smiling softly with sparkling eyes as she thinks, warm McDonald’s ambient lighting, shallow depth of field, subtle push-in camera movement, her expression shifts from hesitation to decision, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"好像……不能只帶走一半耶。\\\", speaking in Mandarin Chinese, she says: \\\"好像……不能只帶走一半耶。\\\"\",\"length\":57,\"color\":\"#f39c12\"},{\"prompt\":\"Vertical 9:16, medium close-up, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, sitting at a McDonald’s table with fries, burger, drink, and toy box, happily holding a Gundam toy close to the camera, bright joyful smile, warm restaurant lighting, soft bokeh in the background, shallow depth of field, slight forward camera drift, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"所以我又買了一組，嘿嘿。\\\", speaking in Mandarin Chinese, she says: \\\"所以我又買了一組，嘿嘿。\\\"\",\"length\":73,\"color\":\"#1abc9c\"},{\"prompt\":\"Vertical 9:16, close-up tabletop shot, cinematic photorealism, the same young East Asian woman with short black bob haircut, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, back at home arranging two Gundam toys side by side on a wooden table, one dark gray Blade version and one red-white Striker version, nearby are a McDonald’s paper bag, opened boxes, wrappers, leftover fries and drink cups, warm golden home lighting, shallow depth of field, gentle downward camera move, her hands carefully straighten the figures with a satisfied smile, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \\\"這樣剛剛好，今天也有被我留下來。\\\", speaking in Mandarin Chinese, she says: \\\"這樣剛剛好，今天也有被我留下來。\\\"\",\"length\":73,\"color\":\"#e74c3c\"}]}",
+      "local_prompts": "Vertical 9:16, medium close-up, cinematic photorealism, a cute young East Asian woman with a short black bob haircut, straight bangs, round black glasses, wearing a beige oversized hoodie with dark navy hood lining and a light casual jacket, sitting on her bed in a cozy morning bedroom, holding her smartphone, warm sunlight streaming through the window, soft shallow depth of field, gentle push-in camera movement, she looks sleepy but curious, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"我昨天才買到一隻耶，真的有滿足。\", speaking in Mandarin Chinese, she says: \"我昨天才買到一隻耶，真的有滿足。\" | Vertical 9:16, close-up, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, holding her smartphone closer to camera, eyes widening as she sees a McDonald’s x Gundam notification saying only a few are left, warm bedroom light mixed with soft screen glow, shallow depth of field, slight tilt-down camera movement following the phone, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"可是我剛剛看到，剩下最後幾隻而已。\", speaking in Mandarin Chinese, she says: \"可是我剛剛看到，剩下最後幾隻而已。\" | Vertical 9:16, medium shot, cinematic photorealism, the same young East Asian woman with short black bob haircut, straight bangs, round black glasses, beige oversized hoodie with dark navy hood lining and light casual jacket, quickly grabbing her bag and phone beside the bed, standing up in a cozy bedroom, warm morning light, shallow depth of field, quick lateral camera move, she looks flustered but excited, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"我只是想去確認一下啦，不是要買喔。\", speaking in Mandarin Chinese, she says: \"我只是想去確認一下啦，不是要買喔。\" | Vertical 9:16, medium full shot from behind, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, walking toward the entrance of a McDonald’s restaurant while holding her phone, glowing McDonald’s sign above, warm indoor light spilling outward, shallow depth of field, handheld forward tracking movement, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"真的，我只是來看一下而已。\", speaking in Mandarin Chinese, she says: \"真的，我只是來看一下而已。\" | Vertical 9:16, medium shot, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, standing beside a McDonald’s display case, looking at two Gundam toys standing side by side, one dark gray Blade version and one red-white Striker version, warm restaurant lighting, soft reflections on glass, shallow depth of field, slow push-in camera movement, her face brightens with surprise and delight, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"可是它們站在一起的時候，真的好可愛喔。\", speaking in Mandarin Chinese, she says: \"可是它們站在一起的時候，真的好可愛喔。\" | Vertical 9:16, close-up, cinematic photorealism, the same young East Asian woman with short black bob haircut, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, leaning slightly forward at the table, smiling softly with sparkling eyes as she thinks, warm McDonald’s ambient lighting, shallow depth of field, subtle push-in camera movement, her expression shifts from hesitation to decision, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"好像……不能只帶走一半耶。\", speaking in Mandarin Chinese, she says: \"好像……不能只帶走一半耶。\" | Vertical 9:16, medium close-up, cinematic photorealism, the same young East Asian woman with short black bob hair, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, sitting at a McDonald’s table with fries, burger, drink, and toy box, happily holding a Gundam toy close to the camera, bright joyful smile, warm restaurant lighting, soft bokeh in the background, shallow depth of field, slight forward camera drift, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"所以我又買了一組，嘿嘿。\", speaking in Mandarin Chinese, she says: \"所以我又買了一組，嘿嘿。\" | Vertical 9:16, close-up tabletop shot, cinematic photorealism, the same young East Asian woman with short black bob haircut, straight bangs, round black glasses, beige oversized hoodie and light casual jacket, back at home arranging two Gundam toys side by side on a wooden table, one dark gray Blade version and one red-white Striker version, nearby are a McDonald’s paper bag, opened boxes, wrappers, leftover fries and drink cups, warm golden home lighting, shallow depth of field, gentle downward camera move, her hands carefully straighten the figures with a satisfied smile, speaking in Mandarin Chinese with a sweet and light Taiwanese young woman voice, she says: \"這樣剛剛好，今天也有被我留下來。\", speaking in Mandarin Chinese, she says: \"這樣剛剛好，今天也有被我留下來。\"",
+      "segment_lengths": "57, 57, 57, 49, 73, 57, 73, 73",
+      "epsilon": 0.347,
+      "fps": 24,
+      "time_units": "frames",
+      "model": [
+        "542",
+        0
+      ],
+      "clip": [
+        "614",
+        0
+      ],
+      "latent": [
+        "577",
+        0
+      ]
+    },
+    "class_type": "PromptRelayEncodeTimeline",
+    "_meta": {
+      "title": "Prompt Relay 8段分鏡"
+    }
+  },
+  "614": {
+    "inputs": {
+      "clip_name1": "gemma-3-12b-it-qat-UD-Q4_K_XL.gguf",
+      "clip_name2": "ltx-2.3-22b-dev_embeddings_connectors.safetensors",
+      "type": "ltxv"
+    },
+    "class_type": "DualCLIPLoaderGGUF",
+    "_meta": {
+      "title": "文字編碼器 GGUF"
+    }
+  },
+  "615": {
+    "inputs": {
+      "vae_name": "ltx-2.3-22b-dev_audio_vae.safetensors",
+      "device": "main_device",
+      "weight_dtype": "bf16"
+    },
+    "class_type": "VAELoaderKJ",
+    "_meta": {
+      "title": "Audio VAE (KJ)"
+    }
+  },
+  "616": {
+    "inputs": {
+      "vae_name": "ltx-2.3-22b-dev_video_vae.safetensors",
+      "device": "main_device",
+      "weight_dtype": "bf16"
+    },
+    "class_type": "VAELoaderKJ",
+    "_meta": {
+      "title": "Video VAE (KJ)"
+    }
+  },
+  "617": {
+    "inputs": {
+      "unet_name": "ltx-2.3-22b-dev-Q4_K_M.gguf"
+    },
+    "class_type": "UnetLoaderGGUF",
+    "_meta": {
+      "title": "主模型 GGUF Q4_K_M"
+    }
+  },
+  "621": {
+    "inputs": {
+      "lora_name": "ltx-2.3-22b-distilled-lora-384.safetensors",
+      "strength_model": 0.5,
+      "model": [
+        "617",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "Distilled LoRA"
+    }
+  },
+  "584_01": {
+    "inputs": {
+      "image": "shot01.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot01 載入"
+    }
+  },
+  "586_01": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_01",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot01"
+    }
+  },
+  "584_02": {
+    "inputs": {
+      "image": "shot02.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot02 載入"
+    }
+  },
+  "586_02": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_02",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot02"
+    }
+  },
+  "584_03": {
+    "inputs": {
+      "image": "shot03.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot03 載入"
+    }
+  },
+  "586_03": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_03",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot03"
+    }
+  },
+  "584_04": {
+    "inputs": {
+      "image": "shot04.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot04 載入"
+    }
+  },
+  "586_04": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_04",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot04"
+    }
+  },
+  "584_05": {
+    "inputs": {
+      "image": "shot05.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot05 載入"
+    }
+  },
+  "586_05": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_05",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot05"
+    }
+  },
+  "584_06": {
+    "inputs": {
+      "image": "shot06.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot06 載入"
+    }
+  },
+  "586_06": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_06",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot06"
+    }
+  },
+  "584_07": {
+    "inputs": {
+      "image": "shot07.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot07 載入"
+    }
+  },
+  "586_07": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_07",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot07"
+    }
+  },
+  "584_08": {
+    "inputs": {
+      "image": "shot08.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shot08 載入"
+    }
+  },
+  "586_08": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "584_08",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXV預處理 Shot08"
+    }
+  }
+}
