@@ -47,7 +47,7 @@
 
 ### 1. 下載工具
 
-直接下載 [`zibai_pipeline_v5.html`](zibai_pipeline_v5.html)，**不需要安裝任何東西**，瀏覽器直接打開。
+直接下載 [`zibai_pipeline_v7.html`](zibai_pipeline_v7.html)，**不需要安裝任何東西**，瀏覽器直接打開。
 
 ### 2. 安裝 ComfyUI 必要節點
 
@@ -128,10 +128,22 @@ dialogue: 中文對白
 | 數值 | 效果 |
 |------|------|
 | 5–10 | 錨定太強 → 人物幾乎不動、畫面凍結 |
-| **25–35** | **甜蜜點** → 外觀保持 + 動態自然 |
-| 40+ | 錨定太弱 → 人物外觀飄移 |
+| **18–25** | **甜蜜點** → 外觀保持 + 動態自然 |
+| 35+ | 錨定太弱 → 人物外觀飄移 |
 
-預設 **30**，從參考 workflow 驗證的設定。
+預設 **22**，實測較穩定的數值。
+
+### Anchor Strength（錨點強度）
+
+控制錨點圖片「釘住」該幀的力道：
+
+| 數值 | 效果 |
+|------|------|
+| 1.0 | 完全照圖，相鄰幀不連貫 → 容易閃爍 |
+| **0.70** | **甜蜜點** → 保持外觀 + 過渡自然 |
+| 0.5 以下 | 模型太自由 → 角色漂移走形 |
+
+預設 **0.70**，動作幅度大的 shot 可調高至 0.80。
 
 ### Steps（Distilled LoRA 專用）
 
@@ -198,8 +210,8 @@ python fix_kjnodes.py
 
 | 檔案 | 說明 |
 |------|------|
-| `prompt_relay_ltx23_test_02.json` | 單卡參考 workflow（640×640，測試用） |
-| `zibai_14shots_mgpu_1280.json` | 雙卡 1280×720，14 分鏡，Multi-GPU |
+| `workflow_single_gpu.json` | 單卡參考 workflow（640×640，測試用） |
+| `workflow_multi_gpu.json` | 雙卡 1280×720，Multi-GPU（dual RTX 3090） |
 
 Multi-GPU 版使用 `LTXV2CheckpointLoaderMultiGPU` 和 `LTXV2AudioVAELoaderMultiGPU`，需要雙卡環境（如 dual RTX 3090）。
 
