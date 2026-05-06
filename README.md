@@ -47,7 +47,7 @@
 
 ### 1. 下載工具
 
-直接下載 [`zibai_pipeline_v8.html`](https://syu0519.github.io/ltx-promptrelay-shotboard/workflows/zibai_pipeline_v8.html)，**不需要安裝任何東西**，瀏覽器直接打開。
+直接下載 [`zibai_pipeline_v9.html`](https://syu0519.github.io/ltx-promptrelay-shotboard/workflows/zibai_pipeline_v9.html)，**不需要安裝任何東西**，瀏覽器直接打開。
 
 ### 2. 安裝 ComfyUI 必要節點
 
