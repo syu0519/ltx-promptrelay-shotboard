@@ -630,7 +630,9 @@ const RESOLUTIONS = {
   ],
   twopass: [
     { v: '832x480',  l: '832 × 480 → 1664 × 960（16:9 2-pass）', def: true },
-    { v: '480x832',  l: '480 × 832 → 960 × 1664（9:16 2-pass 直式）'       },
+    { v: '640x360',  l: '640 × 360 → 1280 × 720（16:9 長幀推薦）'           },
+    { v: '480x832',  l: '480 × 832 → 960 × 1664（9:16 2-pass 直式）'        },
+    { v: '360x640',  l: '360 × 640 → 720 × 1280（9:16 長幀推薦直式）'       },
   ]
 };
 
@@ -982,16 +984,49 @@ function exportJSON() {
 }
 
 // ── SEND TO COMFYUI ───────────────────────────────────────
+// ── 2-pass 自動分段 ──────────────────────────────────────
+const TWOPASS_FRAME_LIMIT = 473;
+
+function splitShotsForTwoPass(allShots, fps) {
+  const total = ltxTotalFrames(allShots, fps);
+  if (total <= TWOPASS_FRAME_LIMIT || allShots.length <= 1) {
+    return [allShots]; // 不需要分段
+  }
+  // 找切割點：從中間的 shot 開始，讓兩段盡量均等
+  const half = total / 2;
+  let acc = 0, splitIdx = 1;
+  for (let i = 0; i < allShots.length - 1; i++) {
+    acc += ltxFrames(allShots[i].duration, fps);
+    if (acc >= half) { splitIdx = i + 1; break; }
+  }
+  return [allShots.slice(0, splitIdx), allShots.slice(splitIdx)];
+}
+
 async function sendToComfyUI() {
   if (!shots.length) return;
   cancelled = false;
 
-  const comfyUrl = document.getElementById('comfy-url').value.trim();
+  const comfyUrl  = document.getElementById('comfy-url').value.trim();
+  const isTwoPass = document.getElementById('gpu-mode').value === 'twopass';
+  const fps       = getFps();
+  const totalFrames = ltxTotalFrames(shots, fps);
+
+  // 2-pass 超過上限 → 自動分段
+  const groups = (isTwoPass && totalFrames > TWOPASS_FRAME_LIMIT)
+    ? splitShotsForTwoPass(shots, fps)
+    : [shots];
+
+  const needSplit = groups.length > 1;
+  if (needSplit) {
+    log(`2-pass 分段模式：總 ${totalFrames} 幀 > ${TWOPASS_FRAME_LIMIT}，自動拆成 ${groups.length} 個任務`, 'warn');
+    groups.forEach((g, i) => log(`  Part ${i+1}：${g.length} shots，${ltxTotalFrames(g, fps)} 幀`, 'info'));
+  }
+
   showOverlay('送出到 ComfyUI', '正在上傳圖片並組合 workflow...', 0);
   log('開始送出 ComfyUI...', 'ok');
 
   try {
-    // 1. upload images that user has selected
+    // 1. 上傳所有圖片（只需一次）
     const imgCount = Object.keys(imgFiles).length;
     if (imgCount > 0) {
       let uploaded = 0;
@@ -1001,7 +1036,7 @@ async function sendToComfyUI() {
         const pad = String(parseInt(id)).padStart(2,'0');
         const fname = `shot${pad}.png`;
 
-        updateOverlay(`上傳圖片 ${fname}`, (uploaded/imgCount)*60);
+        updateOverlay(`上傳圖片 ${fname}`, (uploaded/imgCount)*50);
 
         const formData = new FormData();
         formData.append('image', file, fname);
@@ -1016,24 +1051,42 @@ async function sendToComfyUI() {
 
     if (cancelled) throw new Error('已取消');
 
-    // 2. build & send workflow
-    updateOverlay('組合 Workflow JSON', 70);
-    const wf = buildWorkflow();
+    // 2. 依分段送出 workflow
+    const savedShots = shots;
+    for (let gi = 0; gi < groups.length; gi++) {
+      if (cancelled) throw new Error('已取消');
 
-    updateOverlay('送出生成任務', 85);
-    const r = await fetch(`${comfyUrl}/prompt`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: wf })
-    });
-    if (!r.ok) throw new Error(`ComfyUI 回應錯誤：${r.status}`);
+      const groupShots = groups[gi];
+      const partLabel  = needSplit ? ` Part ${gi+1}/${groups.length}` : '';
+      updateOverlay(`組合 Workflow JSON${partLabel}`, 55 + gi * 20);
 
-    const data = await r.json();
-    const promptId = data.prompt_id;
-    updateOverlay('任務已送出 ✓', 100);
-    log(`任務 ID：${promptId}`, 'ok');
-    log(`共 ${shots.length} 個分鏡，總幀數 ${ltxTotalFrames(shots, getFps())}，格率 ${getFps()} fps`, 'info');
+      // 暫時替換 shots 來 buildWorkflow
+      shots = groupShots;
+      const wf = buildWorkflow();
 
+      // 分段時修改輸出檔名避免覆蓋
+      if (needSplit) {
+        const suffix = `_part${gi+1}`;
+        if (wf['604']) wf['604'].inputs.filename_prefix = `ltx23_zibai${suffix}`;
+        if (wf['806']) wf['806'].inputs.filename_prefix = `ltx23_zibai_1stpass${suffix}`;
+      }
+
+      updateOverlay(`送出任務${partLabel}`, 75 + gi * 20);
+      const r = await fetch(`${comfyUrl}/prompt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: wf })
+      });
+      if (!r.ok) throw new Error(`ComfyUI 回應錯誤：${r.status}`);
+
+      const data = await r.json();
+      log(`任務${partLabel} ID：${data.prompt_id}`, 'ok');
+      log(`  ${groupShots.length} shots，${ltxTotalFrames(groupShots, fps)} 幀`, 'info');
+    }
+
+    shots = savedShots; // 還原
+    updateOverlay('全部任務已送出 ✓', 100);
+    if (needSplit) log('ComfyUI 會依序自動跑完兩個任務，完成後用 DaVinci 接合', 'ok');
     setTimeout(hideOverlay, 1500);
 
   } catch(err) {
